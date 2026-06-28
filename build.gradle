@@ -1,0 +1,53 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.0'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.re'
+version = '0.0.1-SNAPSHOT'
+description = 'hospital'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Web & Validation
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // Security & JWT (Bắt buộc cho hạ tầng xác thực)
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    // Database & JPA
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // Lombok (Giảm thiểu boilerplate code)
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // DevTools
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // Testing (Gói duy nhất chứa toàn bộ thư viện Test chuẩn của Spring)
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+    runtimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
