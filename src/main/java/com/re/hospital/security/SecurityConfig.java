@@ -53,10 +53,11 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Vô hiệu hóa CSRF cho Stateless API
                 .authorizeHttpRequests(auth -> auth
-                        // Sửa tạm thời các dòng này thành permitAll() để test API Admin và Patient:
+                        // Sửa tạm thời các dòng này thành permitAll() để test API Admin, Patient và Doctor:
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/v1/admin/**").permitAll()  // Mở khóa để hết bị lỗi 403
                         .requestMatchers("/api/v1/patient/**").permitAll()
+                        .requestMatchers("/api/v1/doctor/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

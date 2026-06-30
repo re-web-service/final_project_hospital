@@ -6,14 +6,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 public class JwtUtils {
 
-    @Value("${app.jwt.secret:SecretKeyToEncryptJwtTokensMustBeLongEnoughInsideApplicationProperties}")
+    @Value("${app.jwt.secret}")
     private String jwtSecret;
 
-    @Value("${app.jwt.expiration-ms:3600000}") // Mặc định 1 giờ
+    @Value("${app.jwt.expiration-ms}")
     private int jwtExpirationMs;
 
     private Key getSigningKey() {
@@ -21,14 +22,11 @@ public class JwtUtils {
     }
 
     public String generateTokenFromUsername(String username) {
-        return BcryptTokenBuilder(username, jwtExpirationMs);
-    }
-
-    private String BcryptTokenBuilder(String username, int expiry) {
         return Jwts.builder()
+                .setId(UUID.randomUUID().toString())
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + expiry))
+                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -42,12 +40,30 @@ public class JwtUtils {
                 .getSubject();
     }
 
+    public String getTokenIdFromJwtToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getId();
+    }
+
+    public Date getExpirationFromJwtToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration();
+    }
+
     public boolean validateJwtToken(String authToken) {
         try {
             Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(authToken);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
-            // Có thể log lỗi cụ thể ở đây (Expired, Malformed,...)
+            // log error
         }
         return false;
     }
